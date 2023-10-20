@@ -1,0 +1,16 @@
+version: '3'
+
+services:
+  db_dev:
+    extends:
+      file: docker-compose.infra.yml
+      service: db_dev
+
+  fastapi:
+    image: app
+    platform: linux/amd64
+    build:
+      dockerfile: Dockerfile
+    command: uvicorn bank.api:app --host 0.0.0.0
+    ports:
+      - 8000:8000

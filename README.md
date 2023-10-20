@@ -8,3 +8,13 @@
 
 An example of using [depeche-db](https://github.com/depeche-py/depeche-db) to
 build an event-sourced application.
+
+---
+
+## Run
+
+```
+docker compose up --build
+```
+
+Now visit [http://localhost:8000/docs](http://localhost:8000/docs) in your browser.

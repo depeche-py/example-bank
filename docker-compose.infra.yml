@@ -1,0 +1,12 @@
+version: '3'
+
+services:
+  db_dev:
+    image: 'postgres:${POSTGRES_VERSION:-14.5}'
+    environment:
+      POSTGRES_USER: depeche
+      POSTGRES_PASSWORD: depeche
+      POSTGRES_DB: depeche_demo
+    ports:
+      - 5888:5432
+    restart: unless-stopped
