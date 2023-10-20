@@ -10,6 +10,7 @@ readme = "README.md"
 python = "^3.10"
 depeche-db = "^0.4.3"
 fastapi = "^0.104.0"
+uvicorn = "^0.23.2"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^7.4.2"
