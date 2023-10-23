@@ -24,4 +24,4 @@ services:
       dockerfile: Dockerfile
     env_file:
       - compose.env
-    command: python -m bank.infra
+    command: python -m bank.run_executor
