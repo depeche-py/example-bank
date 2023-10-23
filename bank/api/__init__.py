@@ -1,8 +1,2 @@
-import fastapi as _fastapi
-
-app = _fastapi.FastAPI()
-
-
-@app.get("/")
-def index():
-    return {"message": "Hello, world!"}
+from ._base import app  # noqa: F401
+from . import account, index, transfer  # noqa: F401

@@ -11,6 +11,17 @@ services:
     platform: linux/amd64
     build:
       dockerfile: Dockerfile
+    env_file:
+      - compose.env
     command: uvicorn bank.api:app --host 0.0.0.0
     ports:
       - 8000:8000
+
+  depeche_executor:
+    image: app
+    platform: linux/amd64
+    build:
+      dockerfile: Dockerfile
+    env_file:
+      - compose.env
+    command: python -m bank.infra
