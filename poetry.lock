@@ -179,13 +179,13 @@ toml = ["tomli"]
 
 [[package]]
 name = "depeche-db"
-version = "0.4.4"
+version = "0.5.0"
 description = "A library for building event-based systems on top of PostgreSQL"
 optional = false
 python-versions = ">=3.9,<4.0"
 files = [
-    {file = "depeche_db-0.4.4-py3-none-any.whl", hash = "sha256:1a7f9c9c9619ede04dc1dd711e44bf702e3ce93db0e4a72c893244e213ec4712"},
-    {file = "depeche_db-0.4.4.tar.gz", hash = "sha256:30fe2f32662b60bb43110a2926ffcb3073b3e4e7df0d090e70315d538188edef"},
+    {file = "depeche_db-0.5.0-py3-none-any.whl", hash = "sha256:5a24e5163541013bb7bf2fe18dce2fab87b7638d623df86d6b7517b45b78590a"},
+    {file = "depeche_db-0.5.0.tar.gz", hash = "sha256:26bd524fe678d8be4e8208063c19835ff630d4cc227348b744284527f2e82265"},
 ]
 
 [package.dependencies]
@@ -1158,4 +1158,4 @@ watchmedo = ["PyYAML (>=3.10)"]
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.10"
-content-hash = "dc1c1aaae74c5d260c7a9d1ddd444a208aa8c98a65e1d800ae74db2736765598"
+content-hash = "9f0379652c1211ef2e3a11b8befef5d4f24d3b6346632e9892453cb978d72e38"

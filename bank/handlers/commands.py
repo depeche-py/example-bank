@@ -3,6 +3,7 @@ from .. import domain as _domain
 from .. import messages as _messages
 from .. import di as _di
 from .repositories import AccountRepo, TransferRepo
+from depeche_db import MessageHandlerRegister
 
 
 def command_handler(fn):
@@ -72,7 +73,10 @@ class CommandHandler(_CommandHandler):
         return transfer.id
 
 
-# TODO subscription handler defined over here
+async_handlers = MessageHandlerRegister[_messages.AppMessage]()
+
+
+@async_handlers.register
 def handle_async_account_commands(
     command: _messages.DepositCommand | _messages.WithdrawCommand,
     container: _di.Container,

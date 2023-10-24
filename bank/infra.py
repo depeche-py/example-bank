@@ -6,6 +6,7 @@ from depeche_db import (
     Subscription,
     MessagePartitioner,
     StoredMessage,
+    SubscriptionRunner,
 )
 from depeche_db.tools import PydanticMessageSerializer
 
@@ -85,10 +86,11 @@ def get_runnables():
     account_commands_subscription = Subscription(
         name="account_commands_subscription",
         stream=account_commands,
-        call_middleware=DiMiddleware("command"),
     )
-    account_commands_subscription.handler.register(
-        commands.handle_async_account_commands
+    account_commands_subscription_runner = SubscriptionRunner.create(
+        subscription=account_commands_subscription,
+        handlers=commands.async_handlers,
+        call_middleware=DiMiddleware("command"),
     )
 
     account_events = AggregatedStream(
@@ -98,14 +100,16 @@ def get_runnables():
         stream_wildcards=["account-%"],
     )
 
-    transfer_account_subscription = Subscription(
+    account_subscription = Subscription(
         # TODO rename
-        name="transfer_subscribtion",
+        name="account_subscription",
         stream=account_events,
+    )
+    account_subscription_runner = SubscriptionRunner.create(
+        subscription=account_subscription,
+        handlers=events.AccountHandler(),
         call_middleware=DiMiddleware("event"),
     )
-    transfer_account_subscription.handler.register(events.handle_account_withdrawn)
-    transfer_account_subscription.handler.register(events.handle_account_deposited)
 
     transfer_events = AggregatedStream(
         name="transfer_events",
@@ -113,21 +117,21 @@ def get_runnables():
         partitioner=PartitionByTransferId(),
         stream_wildcards=["transfer-%"],
     )
-
-    transfer_subscribtion = Subscription(
-        # TODO rename
-        name="transfer_subscribtion1",
+    transfer_subscription = Subscription(
+        name="transfer_subscription",
         stream=transfer_events,
+    )
+    transfer_subscription_runner = SubscriptionRunner.create(
+        subscription=transfer_subscription,
+        handlers=events.TransferHandler(),
         call_middleware=DiMiddleware("event"),
     )
-    transfer_subscribtion.handler.register(events.handle_transfer_initiated)
-    transfer_subscribtion.handler.register(events.handle_transfer_withdrawn)
 
     return [
         account_commands.projector,
         account_events.projector,
         transfer_events.projector,
-        account_commands_subscription.handler,
-        transfer_account_subscription.handler,
-        transfer_subscribtion.handler,
+        account_commands_subscription_runner,
+        account_subscription_runner,
+        transfer_subscription_runner,
     ]
