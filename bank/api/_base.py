@@ -15,8 +15,8 @@ container = _fastapi.Depends(_container)
 
 def _command_handler(
     container_instance: _di.Container = container,
-) -> commands.CommandHandler:
-    return container_instance.resolve(commands.CommandHandler)
+) -> commands.CommandHandlerWithDI:
+    return container_instance.resolve(commands.CommandHandlerWithDI)
 
 
 command_handler = _fastapi.Depends(_command_handler)

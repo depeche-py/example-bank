@@ -3,32 +3,11 @@ from .. import domain as _domain
 from .. import messages as _messages
 from .. import di as _di
 from .repositories import AccountRepo, TransferRepo
-from depeche_db import MessageHandlerRegister
+from depeche_db import MessageHandler
 
 
-def command_handler(fn):
-    fn.__command_handler__ = True
-    return fn
-
-
-class _CommandHandler:
-    def __init__(self, container: _di.Container):
-        self._container = container
-        self._injector = _di.Injector(container)
-        self._handlers = {}
-        for name in dir(self):
-            fn = getattr(self, name)
-            if getattr(fn, "__command_handler__", False):
-                self._handlers[fn.__annotations__["command"]] = fn
-
-    def handle(self, command: _messages.AppMessage) -> _uuid.UUID | None:
-        if type(command) in self._handlers:
-            return self._injector.inject(self._handlers[type(command)], command=command)
-        raise NotImplementedError(f"Command {type(command)} is not supported")
-
-
-class CommandHandler(_CommandHandler):
-    @command_handler
+class CommandHandler(MessageHandler[_messages.AppMessage]):
+    @MessageHandler.register
     def create_account(
         self, command: _messages.CreateAccountCommand, repo: AccountRepo
     ) -> _uuid.UUID:
@@ -39,7 +18,7 @@ class CommandHandler(_CommandHandler):
         repo.add(account)
         return account.id
 
-    @command_handler
+    @MessageHandler.register
     def deposit(
         self, command: _messages.DepositCommand, repo: AccountRepo
     ) -> _uuid.UUID:
@@ -49,7 +28,7 @@ class CommandHandler(_CommandHandler):
         repo.save(account, current_version)
         return account.id
 
-    @command_handler
+    @MessageHandler.register
     def withdraw(
         self, command: _messages.WithdrawCommand, repo: AccountRepo
     ) -> _uuid.UUID:
@@ -59,7 +38,7 @@ class CommandHandler(_CommandHandler):
         repo.save(account, current_version)
         return account.id
 
-    @command_handler
+    @MessageHandler.register
     def initiate_transfer(
         self, command: _messages.InitiateTransferCommand, repo: TransferRepo
     ) -> _uuid.UUID:
@@ -73,12 +52,11 @@ class CommandHandler(_CommandHandler):
         return transfer.id
 
 
-async_handlers = MessageHandlerRegister[_messages.AppMessage]()
+class CommandHandlerWithDI:
+    def __init__(self, container: _di.Container):
+        self.injector = _di.Injector(container)
+        self.register = CommandHandler()
 
-
-@async_handlers.register
-def handle_async_account_commands(
-    command: _messages.DepositCommand | _messages.WithdrawCommand,
-    container: _di.Container,
-):
-    return container.resolve(CommandHandler).handle(command)
+    def handle(self, command: _messages.AppMessage) -> _uuid.UUID:
+        handler = self.register.get_handler(type(command))
+        return self.injector.inject(handler.handler, command=command)

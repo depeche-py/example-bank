@@ -1,6 +1,6 @@
 import uuid as _uuid
 from ._base import app, command_handler, query_handler
-from ..handlers.commands import CommandHandler
+from ..handlers.commands import CommandHandlerWithDI
 from ..handlers.queries import QueryHandler
 from .. import messages as _messages
 import pydantic as _pydantic
@@ -25,7 +25,7 @@ class Transfer(_pydantic.BaseModel):
 @app.post("/transfer")
 def initiate_transfer(
     transfer: TransferIn,
-    commands: CommandHandler = command_handler,
+    commands: CommandHandlerWithDI = command_handler,
     query: QueryHandler = query_handler,
 ) -> Transfer:
     transfer_id = commands.handle(

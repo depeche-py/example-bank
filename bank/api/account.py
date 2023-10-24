@@ -1,7 +1,7 @@
 import fastapi as _fastapi
 import uuid as _uuid
 from ._base import app, command_handler, query_handler
-from ..handlers.commands import CommandHandler
+from ..handlers.commands import CommandHandlerWithDI
 from ..handlers.queries import QueryHandler
 from .. import messages as _messages
 import pydantic as _pydantic
@@ -23,7 +23,7 @@ class Account(_pydantic.BaseModel):
 @app.post("/account")
 def create_account(
     account: AccountInput,
-    commands: CommandHandler = command_handler,
+    commands: CommandHandlerWithDI = command_handler,
     query: QueryHandler = query_handler,
 ) -> Account:
     account_id = commands.handle(
@@ -44,7 +44,7 @@ def get_account(
 def deposit(
     account_id: _uuid.UUID,
     amount: int = _fastapi.Body(..., embed=True),
-    commands: CommandHandler = command_handler,
+    commands: CommandHandlerWithDI = command_handler,
     query: QueryHandler = query_handler,
 ):
     commands.handle(_messages.DepositCommand(account_id=account_id, amount=amount))
@@ -55,7 +55,7 @@ def deposit(
 def withdraw(
     account_id: _uuid.UUID,
     amount: int = _fastapi.Body(..., embed=True),
-    commands: CommandHandler = command_handler,
+    commands: CommandHandlerWithDI = command_handler,
     query: QueryHandler = query_handler,
 ):
     commands.handle(_messages.WithdrawCommand(account_id=account_id, amount=amount))

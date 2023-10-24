@@ -33,10 +33,8 @@ def get_di_container() -> _di.Container:
     container.register(MessageStore[_messages.AppMessage], _message_store)
     container.register(repositories.AccountRepo, repositories.EventStoreAccountRepo)
     container.register(repositories.TransferRepo, repositories.EventStoreTransferRepo)
-    container.register(
-        commands.CommandHandler, lambda: commands.CommandHandler(container)
-    )
-    container.register(queries.QueryHandler, queries.QueryHandler)
+    container.register(commands.CommandHandlerWithDI)
+    container.register(queries.QueryHandler)
     return container
 
 
@@ -89,7 +87,7 @@ def get_runnables():
     )
     account_commands_subscription_runner = SubscriptionRunner.create(
         subscription=account_commands_subscription,
-        handlers=commands.async_handlers,
+        handlers=commands.CommandHandler(),
         call_middleware=DiMiddleware("command"),
     )
 
