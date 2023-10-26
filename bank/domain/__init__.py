@@ -1,6 +1,7 @@
 import uuid as _uuid
 
-from .. import event_sourcing as _es
+from depeche_db import event_sourcing as _es
+
 from .. import messages as _messages
 
 
