@@ -1,3 +1,4 @@
+import explicit_di as _di
 import sqlalchemy as _sa
 from depeche_db import (
     CallMiddleware,
@@ -8,7 +9,6 @@ from depeche_db import (
 from depeche_db.tools import PydanticMessageSerializer
 
 from . import config as _config
-from . import di as _di
 from . import messages as _messages
 from .handlers import commands, queries, repositories
 
@@ -59,8 +59,7 @@ class DiMiddleware(CallMiddleware):
 
     def call(self, handler, message):
         container = get_di_container()
-        injector = _di.Injector(container)
-        return injector.inject(handler, **{self.message_key: message})
+        return container.inject(handler, **{self.message_key: message})
 
 
 def get_runnables():

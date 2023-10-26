@@ -219,6 +219,17 @@ files = [
 test = ["pytest (>=6)"]
 
 [[package]]
+name = "explicit-di"
+version = "0.1.1"
+description = ""
+optional = false
+python-versions = ">=3.9,<4.0"
+files = [
+    {file = "explicit_di-0.1.1-py3-none-any.whl", hash = "sha256:a945598c5c2b5524e9c509636096686be9f768a3c0978da09583969b6beb7fbf"},
+    {file = "explicit_di-0.1.1.tar.gz", hash = "sha256:395b85d07f00841ce7665471adc9ace5e4a9ccfc3d688d5f05f4dc1fde2cc043"},
+]
+
+[[package]]
 name = "fastapi"
 version = "0.104.0"
 description = "FastAPI framework, high performance, easy to learn, fast to code, ready for production"
@@ -1158,4 +1169,4 @@ watchmedo = ["PyYAML (>=3.10)"]
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.10"
-content-hash = "983b21be900786f9df266cbed795c82175f7f108b2780ecfff64200cafd06773"
+content-hash = "6d50007cf267ce85a1b627d0dfd6ab0ff20809ff4a10e6ac06720ea38fd70528"

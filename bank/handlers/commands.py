@@ -1,8 +1,8 @@
 import uuid as _uuid
 
+import explicit_di as _di
 from depeche_db import MessageHandler
 
-from .. import di as _di
 from .. import domain as _domain
 from .. import messages as _messages
 from .repositories import AccountRepo, TransferRepo
@@ -56,9 +56,9 @@ class CommandHandler(MessageHandler[_messages.AppMessage]):
 
 class CommandHandlerWithDI:
     def __init__(self, container: _di.Container):
-        self.injector = _di.Injector(container)
+        self.container = container
         self.register = CommandHandler()
 
     def handle(self, command: _messages.AppMessage) -> _uuid.UUID:
         handler = self.register.get_handler(type(command))
-        return self.injector.inject(handler.handler, command=command)
+        return self.container.inject(handler.handler, command=command)
