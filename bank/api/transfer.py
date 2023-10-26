@@ -17,6 +17,7 @@ class TransferIn(_pydantic.BaseModel):
 class Transfer(_pydantic.BaseModel):
     model_config = _pydantic.ConfigDict(from_attributes=True)
 
+    id: _uuid.UUID
     from_account_id: _uuid.UUID
     to_account_id: _uuid.UUID
     amount: int
@@ -37,4 +38,14 @@ def initiate_transfer(
             amount=transfer.amount,
         )
     )
+
+    return Transfer.model_validate(query.get_transfer(transfer_id))
+
+
+@app.get("/transfer/{transfer_id}")
+def get_transfer(
+    transfer_id: _uuid.UUID,
+    commands: CommandHandlerWithDI = command_handler,
+    query: QueryHandler = query_handler,
+) -> Transfer:
     return Transfer.model_validate(query.get_transfer(transfer_id))

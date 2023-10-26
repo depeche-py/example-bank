@@ -44,7 +44,7 @@ def test_withdraw(api_client):
     }
 
 
-def test_transfer(api_client):
+def test_transfer(api_client, run_background_processing):
     from_account_id = api_client.post(
         "/account", json={"account_number": "1234"}
     ).json()["id"]
@@ -60,9 +60,23 @@ def test_transfer(api_client):
         },
     )
     assert resp.status_code == 200
-    assert resp.json() == {
+    result = resp.json()
+    transfer_id = result.pop("id")
+    assert result == {
         "from_account_id": from_account_id,
         "to_account_id": to_account_id,
         "amount": 100,
         "status": "initial",
     }
+
+    run_background_processing(3)
+
+    resp = api_client.get(f"/transfer/{transfer_id}")
+    assert resp.status_code == 200
+    assert resp.json()["status"] == "withdrawn"
+
+    run_background_processing(3)
+
+    resp = api_client.get(f"/transfer/{transfer_id}")
+    assert resp.status_code == 200
+    assert resp.json()["status"] == "finished"
