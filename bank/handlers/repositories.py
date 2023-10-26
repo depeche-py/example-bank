@@ -1,8 +1,10 @@
 import uuid as _uuid
+
+from depeche_db import MessageStore
+
+from .. import domain as _domain
 from .. import event_sourcing as _es
 from .. import messages as _messages
-from .. import domain as _domain
-from depeche_db import MessageStore
 
 
 class AccountRepo(_es.repository.Repo[_domain.Account, _uuid.UUID]):

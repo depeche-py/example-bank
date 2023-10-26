@@ -1,5 +1,6 @@
-from . import config as _config
 from depeche_db import Executor
+
+from . import config as _config
 from . import infra as _infra
 
 

@@ -1,4 +1,5 @@
 import fastapi as _fastapi
+
 from .. import di as _di
 from .. import infra as _infra
 from ..handlers import commands, queries

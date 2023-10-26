@@ -1,9 +1,11 @@
 import uuid as _uuid
-from ._base import app, command_handler, query_handler
+
+import pydantic as _pydantic
+
+from .. import messages as _messages
 from ..handlers.commands import CommandHandlerWithDI
 from ..handlers.queries import QueryHandler
-from .. import messages as _messages
-import pydantic as _pydantic
+from ._base import app, command_handler, query_handler
 
 
 class TransferIn(_pydantic.BaseModel):

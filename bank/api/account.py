@@ -1,10 +1,12 @@
-import fastapi as _fastapi
 import uuid as _uuid
-from ._base import app, command_handler, query_handler
+
+import fastapi as _fastapi
+import pydantic as _pydantic
+
+from .. import messages as _messages
 from ..handlers.commands import CommandHandlerWithDI
 from ..handlers.queries import QueryHandler
-from .. import messages as _messages
-import pydantic as _pydantic
+from ._base import app, command_handler, query_handler
 
 
 class AccountInput(_pydantic.BaseModel):
@@ -43,7 +45,7 @@ def get_account(
 @app.post("/account/{account_id}/deposit")
 def deposit(
     account_id: _uuid.UUID,
-    amount: int = _fastapi.Body(..., embed=True),
+    amount: int = _fastapi.Body(..., embed=True),  # noqa: B008
     commands: CommandHandlerWithDI = command_handler,
     query: QueryHandler = query_handler,
 ):
@@ -54,7 +56,7 @@ def deposit(
 @app.post("/account/{account_id}/withdraw")
 def withdraw(
     account_id: _uuid.UUID,
-    amount: int = _fastapi.Body(..., embed=True),
+    amount: int = _fastapi.Body(..., embed=True),  # noqa: B008
     commands: CommandHandlerWithDI = command_handler,
     query: QueryHandler = query_handler,
 ):

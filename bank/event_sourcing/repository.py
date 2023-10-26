@@ -3,9 +3,9 @@ from typing import Callable, Generic, TypeVar
 
 from depeche_db import (
     MessagePosition,
+    MessageProtocol,
     MessageStore,
     MessageStoreReader,
-    MessageProtocol,
 )
 
 from .aggregate_root import EventSourcedAggregateRoot

@@ -1,21 +1,16 @@
-from . import config as _config
 import sqlalchemy as _sa
 from depeche_db import (
-    MessageStore,
-    AggregatedStream,
-    Subscription,
+    CallMiddleware,
     MessagePartitioner,
+    MessageStore,
     StoredMessage,
-    SubscriptionRunner,
 )
 from depeche_db.tools import PydanticMessageSerializer
 
+from . import config as _config
 from . import di as _di
-from .handlers import commands, repositories, queries
 from . import messages as _messages
-
-# TODO fix import
-from depeche_db._subscription import CallMiddleware
+from .handlers import commands, queries, repositories
 
 
 def _message_store() -> MessageStore:
@@ -63,7 +58,6 @@ class DiMiddleware(CallMiddleware):
         self.message_key = message_key
 
     def call(self, handler, message):
-        print("DiMiddleware", handler, repr(message))
         container = get_di_container()
         injector = _di.Injector(container)
         return injector.inject(handler, **{self.message_key: message})
@@ -74,53 +68,37 @@ def get_runnables():
 
     message_store = _message_store()
 
-    account_commands = AggregatedStream(
+    account_commands = message_store.aggregated_stream(
         name="account_commands",
-        store=message_store,
         partitioner=PartitionByAccountId(),
         stream_wildcards=["account-command-%"],
     )
 
-    account_commands_subscription = Subscription(
+    account_commands_subscription = account_commands.subscription(
         name="account_commands_subscription",
-        stream=account_commands,
-    )
-    account_commands_subscription_runner = SubscriptionRunner.create(
-        subscription=account_commands_subscription,
         handlers=commands.CommandHandler(),
         call_middleware=DiMiddleware("command"),
     )
 
-    account_events = AggregatedStream(
+    account_events = message_store.aggregated_stream(
         name="account_events",
-        store=message_store,
         partitioner=PartitionByAccountId(),
         stream_wildcards=["account-%"],
     )
 
-    account_subscription = Subscription(
-        # TODO rename
+    account_subscription = account_events.subscription(
         name="account_subscription",
-        stream=account_events,
-    )
-    account_subscription_runner = SubscriptionRunner.create(
-        subscription=account_subscription,
         handlers=events.AccountHandler(),
         call_middleware=DiMiddleware("event"),
     )
 
-    transfer_events = AggregatedStream(
+    transfer_events = message_store.aggregated_stream(
         name="transfer_events",
-        store=message_store,
         partitioner=PartitionByTransferId(),
         stream_wildcards=["transfer-%"],
     )
-    transfer_subscription = Subscription(
+    transfer_subscription = transfer_events.subscription(
         name="transfer_subscription",
-        stream=transfer_events,
-    )
-    transfer_subscription_runner = SubscriptionRunner.create(
-        subscription=transfer_subscription,
         handlers=events.TransferHandler(),
         call_middleware=DiMiddleware("event"),
     )
@@ -129,7 +107,7 @@ def get_runnables():
         account_commands.projector,
         account_events.projector,
         transfer_events.projector,
-        account_commands_subscription_runner,
-        account_subscription_runner,
-        transfer_subscription_runner,
+        account_commands_subscription.runner,
+        account_subscription.runner,
+        transfer_subscription.runner,
     ]

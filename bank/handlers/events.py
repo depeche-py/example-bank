@@ -1,4 +1,5 @@
-from depeche_db import MessageStore, MessageHandler
+from depeche_db import MessageHandler, MessageStore
+
 from .. import messages as _messages
 from . import repositories
 

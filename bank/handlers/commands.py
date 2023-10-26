@@ -1,9 +1,11 @@
 import uuid as _uuid
+
+from depeche_db import MessageHandler
+
+from .. import di as _di
 from .. import domain as _domain
 from .. import messages as _messages
-from .. import di as _di
 from .repositories import AccountRepo, TransferRepo
-from depeche_db import MessageHandler
 
 
 class CommandHandler(MessageHandler[_messages.AppMessage]):

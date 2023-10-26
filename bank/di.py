@@ -1,6 +1,6 @@
 # from https://github.com/PatrickKalkman/python-di/blob/master/custom_di/container.py
 import inspect
-from typing import TypeVar, Type
+from typing import Type, TypeVar
 
 
 class NotRegisteredError(Exception):

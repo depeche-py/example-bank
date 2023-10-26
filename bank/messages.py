@@ -1,11 +1,10 @@
-import uuid as _uuid
 import datetime as _dt
+import uuid as _uuid
+
 import pydantic as _pydantic
 
-from depeche_db import MessageProtocol
 
-
-class Message(_pydantic.BaseModel, MessageProtocol):
+class Message(_pydantic.BaseModel):
     message_id: _uuid.UUID = _pydantic.Field(default_factory=_uuid.uuid4)
     message_time: _dt.datetime = _pydantic.Field(default_factory=_dt.datetime.utcnow)
 
