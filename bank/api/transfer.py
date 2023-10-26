@@ -31,7 +31,7 @@ def initiate_transfer(
     commands: CommandHandlerWithDI = command_handler,
     query: QueryHandler = query_handler,
 ) -> Transfer:
-    transfer_id = commands.handle(
+    result = commands.handle(
         _messages.InitiateTransferCommand(
             from_account_id=transfer.from_account_id,
             to_account_id=transfer.to_account_id,
@@ -39,7 +39,7 @@ def initiate_transfer(
         )
     )
 
-    return Transfer.model_validate(query.get_transfer(transfer_id))
+    return Transfer.model_validate(query.get_transfer(result.aggregate_id))
 
 
 @app.get("/transfer/{transfer_id}")

@@ -28,10 +28,10 @@ def create_account(
     commands: CommandHandlerWithDI = command_handler,
     query: QueryHandler = query_handler,
 ) -> Account:
-    account_id = commands.handle(
+    result = commands.handle(
         _messages.CreateAccountCommand(account_number=account.account_number)
     )
-    return Account.model_validate(query.get_account(account_id))
+    return Account.model_validate(query.get_account(result.aggregate_id))
 
 
 @app.get("/account/{account_id}")
