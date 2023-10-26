@@ -1,7 +1,7 @@
 import uuid as _uuid
 
 from ..domain import Account, Transfer
-from .repositories import AccountRepo, TransferRepo
+from .common import AccountRepo, TransferRepo
 
 
 class QueryHandler:

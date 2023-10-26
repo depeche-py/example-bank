@@ -2,6 +2,7 @@ import explicit_di as _di
 import sqlalchemy as _sa
 from depeche_db import (
     CallMiddleware,
+    Executor,
     MessagePartitioner,
     MessageStore,
     StoredMessage,
@@ -10,7 +11,7 @@ from depeche_db.tools import PydanticMessageSerializer
 
 from . import config as _config
 from . import messages as _messages
-from .handlers import commands, queries, repositories
+from .handlers import commands, common, queries
 
 
 def _message_store() -> MessageStore:
@@ -26,8 +27,8 @@ def get_di_container() -> _di.Container:
     container = _di.Container()
     container.register(_di.Container, lambda: container)
     container.register(MessageStore[_messages.AppMessage], _message_store)
-    container.register(repositories.AccountRepo, repositories.EventStoreAccountRepo)
-    container.register(repositories.TransferRepo, repositories.EventStoreTransferRepo)
+    container.register(common.AccountRepo, common.EventStoreAccountRepo)
+    container.register(common.TransferRepo, common.EventStoreTransferRepo)
     container.register(commands.CommandHandlerWithDI)
     container.register(queries.QueryHandler)
     return container
@@ -110,3 +111,15 @@ def get_runnables():
         account_subscription.runner,
         transfer_subscription.runner,
     ]
+
+
+def main():
+    config = _config.get()
+    executor = Executor(db_dsn=config.db_dsn.get_secret_value())
+    for runnable in get_runnables():
+        executor.register(runnable)
+    executor.run()
+
+
+if __name__ == "__main__":
+    main()

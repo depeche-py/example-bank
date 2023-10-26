@@ -6,7 +6,7 @@ from depeche_db import MessageHandler, MessagePosition
 
 from .. import domain as _domain
 from .. import messages as _messages
-from .repositories import AccountRepo, TransferRepo
+from .common import AccountRepo, TransferRepo
 
 
 class CommandResult(_pydantic.BaseModel):

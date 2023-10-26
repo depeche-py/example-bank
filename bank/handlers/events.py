@@ -1,7 +1,7 @@
 from depeche_db import MessageHandler, MessageStore
 
 from .. import messages as _messages
-from . import repositories
+from .common import TransferRepo
 
 
 class TransferHandler(MessageHandler[_messages.AppMessage]):
@@ -28,7 +28,7 @@ class TransferHandler(MessageHandler[_messages.AppMessage]):
     def handle_transfer_withdrawn(
         self,
         event: _messages.TransferWithdrawnEvent,
-        transfer_repo: repositories.TransferRepo,
+        transfer_repo: TransferRepo,
         message_store: MessageStore[_messages.AppMessage],
     ):
         """
@@ -51,7 +51,7 @@ class AccountHandler(MessageHandler[_messages.AppMessage]):
     def handle_account_withdrawn(
         self,
         event: _messages.WithdrawnEvent,
-        transfer_repo: repositories.TransferRepo,
+        transfer_repo: TransferRepo,
     ):
         if not event.transfer_id:
             return
@@ -64,7 +64,7 @@ class AccountHandler(MessageHandler[_messages.AppMessage]):
     def handle_account_deposited(
         self,
         event: _messages.DepositedEvent,
-        transfer_repo: repositories.TransferRepo,
+        transfer_repo: TransferRepo,
     ):
         if not event.transfer_id:
             return
