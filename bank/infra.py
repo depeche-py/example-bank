@@ -60,6 +60,10 @@ class DiMiddleware(CallMiddleware):
         self.message_key = message_key
 
     def call(self, handler, message):
+        """
+        Intercepts the call to the `handler` function and injects whatever
+        dependencies are needed.
+        """
         container = get_di_container()
         return container.inject(handler, **{self.message_key: message})
 

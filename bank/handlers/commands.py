@@ -15,6 +15,14 @@ class CommandResult(_pydantic.BaseModel):
 
 
 class CommandHandler(MessageHandler[_messages.AppMessage]):
+    """
+    This class is long-lived (it is instantiated once and used for all messages
+    on a subscription).
+
+    All but the first argument of the methods will be resolved by the DI container
+    (see DiMiddleware in infra.py or the `CommandHandlerWithDI` wrapper below).
+    """
+
     @MessageHandler.register
     def create_account(
         self, command: _messages.CreateAccountCommand, repo: AccountRepo
@@ -61,6 +69,11 @@ class CommandHandler(MessageHandler[_messages.AppMessage]):
 
 
 class CommandHandlerWithDI:
+    """
+    This class is used by the REST API and will be instantiated for each
+    request.
+    """
+
     def __init__(self, container: _di.Container):
         self.container = container
         self.register = CommandHandler()
