@@ -11,6 +11,10 @@ build an event-sourced application.
 
 ---
 
+Docs: [https://depeche-py.github.io/depeche-db/examples/bank-eventsourced/](https://depeche-py.github.io/depeche-db/examples/bank-eventsourced/)
+
+---
+
 ## Run
 
 ```

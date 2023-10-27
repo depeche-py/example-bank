@@ -5,6 +5,15 @@ from .common import AccountRepo, TransferRepo
 
 
 class QueryHandler:
+    """
+    Offers methods to query aggregates.
+
+    For simplicity, it returns domain objects directly. In a real application,
+    you would probably want to return DTOs instead.
+
+    It also does not use CQRS, but that is not the point of this example.
+    """
+
     def __init__(self, account_repo: AccountRepo, transfer_repo: TransferRepo):
         self._account_repo = account_repo
         self._transfer_repo = transfer_repo

@@ -1,23 +1,26 @@
-from depeche_db import MessageHandler, MessageStore
+from depeche_db import MessageHandler
 
 from .. import messages as _messages
-from .common import TransferRepo
+from .common import AccountCommandWiter, TransferRepo
 
 
 class TransferHandler(MessageHandler[_messages.AppMessage]):
+    """
+    When the transfer object is changed, send commands to the accounts.
+    """
+
     @MessageHandler.register
     def handle_transfer_initiated(
         self,
         event: _messages.TransferInitiatedEvent,
-        message_store: MessageStore[_messages.AppMessage],
+        account_command_writer: AccountCommandWiter,
     ):
         """
         Command the source account to withdraw the transfer amount
         """
-        # TODO abstract this
-        message_store.write(
-            f"account-command-{event.from_account_id}",
-            _messages.WithdrawCommand(
+        account_command_writer.write(
+            account_id=event.from_account_id,
+            command=_messages.WithdrawCommand(
                 account_id=event.from_account_id,
                 amount=event.amount,
                 transfer_id=event.transfer_id,
@@ -29,16 +32,15 @@ class TransferHandler(MessageHandler[_messages.AppMessage]):
         self,
         event: _messages.TransferWithdrawnEvent,
         transfer_repo: TransferRepo,
-        message_store: MessageStore[_messages.AppMessage],
+        account_command_writer: AccountCommandWiter,
     ):
         """
         Command the target account to deposit the transfer amount
         """
         transfer = transfer_repo.get(event.transfer_id)
-        # TODO abstract this
-        message_store.write(
-            f"account-command-{transfer.to_account_id}",
-            _messages.DepositCommand(
+        account_command_writer.write(
+            account_id=transfer.to_account_id,
+            command=_messages.DepositCommand(
                 account_id=transfer.to_account_id,
                 amount=transfer.amount,
                 transfer_id=event.transfer_id,
@@ -47,6 +49,11 @@ class TransferHandler(MessageHandler[_messages.AppMessage]):
 
 
 class AccountHandler(MessageHandler[_messages.AppMessage]):
+    """
+    When accounts are changed (in response to an async command sent from
+    `TransferHandler`), update the transfer objects.
+    """
+
     @MessageHandler.register
     def handle_account_withdrawn(
         self,
@@ -57,7 +64,7 @@ class AccountHandler(MessageHandler[_messages.AppMessage]):
             return
         transfer = transfer_repo.get(event.transfer_id)
         current_version = transfer.version
-        transfer.withdraw()
+        transfer.track_withdrawn()
         transfer_repo.save(transfer, current_version)
 
     @MessageHandler.register
@@ -70,5 +77,5 @@ class AccountHandler(MessageHandler[_messages.AppMessage]):
             return
         transfer = transfer_repo.get(event.transfer_id)
         current_version = transfer.version
-        transfer.finish()
+        transfer.track_deposited()
         transfer_repo.save(transfer, current_version)

@@ -29,6 +29,7 @@ def get_di_container() -> _di.Container:
     container.register(MessageStore[_messages.AppMessage], _message_store)
     container.register(common.AccountRepo, common.EventStoreAccountRepo)
     container.register(common.TransferRepo, common.EventStoreTransferRepo)
+    container.register(common.AccountCommandWiter)
     container.register(commands.CommandHandlerWithDI)
     container.register(queries.QueryHandler)
     return container

@@ -2,12 +2,13 @@ import uuid as _uuid
 
 from depeche_db import event_sourcing as _es
 
-from .. import messages as _messages
+from . import messages as _messages
 
 
 class Account(_es.EventSourcedAggregateRoot[_uuid.UUID, _messages.AccountEvent]):
     id: _uuid.UUID
     number: str
+    balance: int
 
     def get_id(self) -> _uuid.UUID | None:
         if hasattr(self, "id"):
@@ -54,11 +55,16 @@ class Account(_es.EventSourcedAggregateRoot[_uuid.UUID, _messages.AccountEvent])
 
 
 class Transfer(_es.EventSourcedAggregateRoot[_uuid.UUID, _messages.TransferEvent]):
+    """
+    This is not only a domain object, but also a process manager (in conjunction
+    with the event handlers defined in `TransferHandler` and `AccountHandler`).
+    """
+
     id: _uuid.UUID
     from_account_id: _uuid.UUID
     to_account_id: _uuid.UUID
     amount: int
-    status: str
+    status: str  # initial, withdrawn, finished
 
     def get_id(self) -> _uuid.UUID | None:
         if hasattr(self, "id"):
@@ -102,8 +108,8 @@ class Transfer(_es.EventSourcedAggregateRoot[_uuid.UUID, _messages.TransferEvent
         )
         return transfer
 
-    def withdraw(self) -> None:
+    def track_withdrawn(self) -> None:
         self.apply(_messages.TransferWithdrawnEvent(transfer_id=self.id))
 
-    def finish(self) -> None:
+    def track_deposited(self) -> None:
         self.apply(_messages.TransferFinishedEvent(transfer_id=self.id))

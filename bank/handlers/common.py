@@ -35,3 +35,11 @@ class EventStoreTransferRepo(
             constructor=_domain.Transfer,
             stream_prefix="transfer",
         )
+
+
+class AccountCommandWiter:
+    def __init__(self, message_store: MessageStore[_messages.AppMessage]):
+        self.message_store = message_store
+
+    def write(self, account_id: _uuid.UUID, command: _messages.AccountCommand):
+        self.message_store.write(f"account-command-{account_id}", command)
